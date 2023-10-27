@@ -1,0 +1,9 @@
+>echo $SHELL  //to known which shell we are using
+
+>chsh  //to change the default shell
+
+>alias dt=date  //to change the cmd date in short to dt
+
+>history  // history of previously cmds
+
+>env  /to list all environment variable

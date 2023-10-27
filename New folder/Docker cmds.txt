@@ -1,0 +1,56 @@
+The Docker run cmd is used to run a container from an image.
+$ Docker run nginx (Running the docker run nginx cmd will run an instance of the nginx application on the Docker host if it already exists. If the image is not present on the host, it will go out to docker hub and pull the image down.)
+
+The docker ps cmd lists all running containers and some basic information about them such as the container ID, the name of the image we used to run the containers, the current status and the name of the container.
+$ docker ps (list containers)
+Each container automatically gets a random ID and name created for it by docker.
+
+$ docker ps -a  (To see all containers running or not and also the outputs all running as well as previously stopped or exited containers.)
+
+$ docker stop <container ID or name>   (To stop the running container we also need to provide either the container ID or the container name)
+
+$ docker rm <container ID or name>   (To remove a stopped or exited container permanently.(if it prints the name back, it has removed it permanently).)
+
+$ docker images (To list all available images and their sizes)
+
+$ docker rmi <image name>   (To remove images i.e you must ensure that no containers are running off that image before attempting to remove the image. Also stop and delete all dependent containers to be able to delete an image.)
+
+$ docker pull <image name>   (To pull image only and not run the container.)
+
+$ docker run <image name> sleep 5   (When the container starts , it runs to sleep cmd and goes into sleep for 5 seconds, post which the sleep cmd exits and the container stops.)
+
+$ docker exec <Name of container> cat /etc/hosts  (In this case to print the contents of the /etc/hosts file.)
+
+$ docker run <image name>  (Docker container in the attached mode)
+
+$ docker run -d <image name>  (Docker container in the detached mode by providing the -d option)
+
+$ docker attach <name/ID(5 character)>    (If u want to attach back to the running container then run the docker attach cmd and specify the name or ID of the Docker container.
+
+$ docker run -it <image name> bash  (It will run the bash cmd and then it loged me in directly to the container since I specified the -it options.)
+
+$ cat /etc/*release*   (to check the operating system)
+
+$ docker start $(docker ps -aq)       (To start all the containers)
+
+$ docker stop $(docker ps -aq)       (To stop all the running containers)
+
+$ docker rm $(docker ps -aq)       (To remove all the containers)
+
+$ docker rmi <imagename/id>       (To delete the the image)
+ 
+$ docker rmi $(docker images)      (To delete allt the images)
+
+$ docker run -i <conatinername/imagename>    (The '-i' parameter is for interactive mode.when the input is given then it will print the output.)
+
+$ docker run -it <conatinername/imagename>   (The -t stands for pseudo terminal. With the combination of -i and t we're now attached to the terminal as well as in an interactive mode on the container.)
+
+$ docker run -p 80:5000 <image/container name>    (port mapping)(Users to access my application through port 80(any port number) on my docker host. I could map port 80 of the local host to port 5000(example of the internal port) on the docker container using the -p parameter in run cmd.)
+
+$ docker run -v /opt/datadir:/var/lib/mysql mysql       (It will implicitly mount the external directory to a folder inside the docker container)
+
+$ docker inspect <container name/id>  (all details of the container and displays in JSON format )
+
+$ docker logs <container name/id>   ( to view the details that was run previous in the detached mode)
+
+$ docker build Dockerfile -t sajith/my-custom-app   (All the layer built are cached, so th layared architecture helps u restart docker build from that particular step in case it fails or to add new steps in the build process)

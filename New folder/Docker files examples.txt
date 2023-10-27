@@ -1,0 +1,5 @@
+Docker Installation process
+
+$ cat /etc/*release* (To confirm the version of the  ubuntu system)
+
+Docker document website we can find the instalation setup for the docker based on the machine and also we can follow the guidance of the cmds.

@@ -1,0 +1,10 @@
+To check the connectivity b/w two server we can use the below cmd(i.e using the other computer ip address).
+>ping <ip address>
+
+To check the database of another ip we can use the below cmd
+> cat >> /etc/hosts
+>ping db 
+
+>hostname
+
+DNS server:-

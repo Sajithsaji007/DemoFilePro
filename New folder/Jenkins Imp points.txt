@@ -1,0 +1,29 @@
+Jenkins is Automation platform
+- Build 
+- Test
+- Deploy 
+software using pipelines and also to automate any task.
+
+Jenkins Infrastructure:-
+- Master server
+    - Control pipelines
+    - Schedules Builds
+- Agents/Minions
+    - Perform the Build.
+1. Commit Triggers Pipeline
+2. Agent selected based on configured labels
+3. Agent Runs Build
+
+Agent Types:
+- Pernament Agents
+    Dedicated Servers for running jobs.(Linux and windows)
+    
+- Cloud Agents
+     Ephemeral/Dynamic Agents spun up on demand.(docker, kubernetes, aws and so on.)
+
+
+Connection between jenkins and docker cmds used:
+$  docker build <imagename and label>
+$  docker network create jenkins
+$  docker network ls
+ 

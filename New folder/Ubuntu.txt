@@ -1,0 +1,7 @@
+$ sudo apt-get update
+
+$ sudo apt-get install -y apt-transport-https
+
+$ sudo systemctl start docker
+
+$ sudo systemctl enable docker

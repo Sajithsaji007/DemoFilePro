@@ -1,0 +1,163 @@
+Using the docker we are able to run each component in a separate container with its own dependencies and its own libraries all on the same VM and the OS, but wihin separate environment or containers, which has to build the Docker configuration once(using the docker run cmd).
+
+Containers
+Containers are completely isolated environments as in, they can have their own processes or services, their own network interfaces, their own mounts like virtual machines, but they all share the same OS kernel.
+
+Docker utilizes the LXC containers.
+Docker offers high level tool with several powerful functionalities, making it really easy for end users.
+
+Operating System
+OS Kernel >> set of software.
+OS Kernel is responsible for interacting with the underlying hardware, while the os kernel remain the same, which is linux in this case and the software above this are making these operating systems different.
+This software may consist different user interface, drivers, compilers, file managers, developer tool etc.
+
+Docker can run any flavor of OS on top of it as long as they're all based on the same kernel.
+Each docker container only has the additional software that makes these operating systems different and docker utilizes the underlying kernel of the docker host which works with all OS.
+
+We cannot run a windows based container on a docker host with linux on it. For that we need docker on a windows server.
+Windows run linux container on a linux virtual machine under the host.
+
+The main purpose of Docker is to package and containerize applications, and to ship them and to run anywhere, anytime as many time we want.
+
+Hardware Infrastructure >> OS >> Docker >> containers
+In the above we have the underlying hardware infrastructure and then the OS and then docker installed on the OS. Docker then manages the containers that run with libraries and Dependencies.
+
+In case of Virtual machine
+Hardware Infrastructure >> Hypervisor >> Virtual machines(own OS, Dependencies and libraries, then the Applications on then)
+
+Each VM has higher disk space and usually in gigabytes in size.
+
+In case of Docker containers are lightweight and are usually in megabytes in size. this allows docker container to boot up faster in matter of seconds
+Docker has less isolation and more resources are shared between the container like kernel.
+
+
+Images:
+An images is a package or a template just like VM template, it is used to create one or more containers.
+Containers are running instances of images that are isolated and have their own environments and set of processses.
+
+With the docker the developers and operations teams work hand in hand to transform the guide into a dockerfile with both of their requiremnts.
+The Docker file is used to create an image for their applications. this image can now run on any host with docker installed on it.
+
+
+The Docker run cmd is used to run a container from an image.
+$ Docker run nginx (Running the docker run nginx cmd will run an instance of the nginx application on the Docker host if it already exists. If the image is not present on the host, it will go out to docker hub and pull the image down.)
+
+The docker ps cmd lists all running containers and some basic information about them such as the container ID, the name of the image we used to run the containers, the current status and the name of the container.
+$ docker ps (list containers)
+Each container automatically gets a random ID and name created for it by docker.
+
+$ docker ps -a  (To see all containers running or not and also the outputs all running as well as previously stopped or exited containers.)
+
+$ docker stop <container ID or name>   (To stop the running container we also need to provide either the container ID or the container name)
+
+$ docker rm <container ID or name>   (To remove a stopped or exited container permanently.(if it prints the name back, it has removed it permanently).)
+
+$ docker images (To list all available images and their sizes)
+
+$ docker rmi <image name>   (To remove images i.e you must ensure that no containers are running off that image before attempting to remove the image. Also stop and delete all dependent containers to be able to delete an image.)
+
+$ docker pull <image name>   (To pull image only and not run the container.)
+
+Containers are not meant to host an operating system.
+Containers are meant to run a specific task or process such as to host an instance of a web server or applicatio server or a database or analysis task.
+
+$ docker run <image name> sleep 5   (When the container starts , it runs to sleep cmd and goes into sleep for 5 seconds, post which the sleep cmd exits and the container stops.)
+
+$ docker exec <Name of container> cat /etc/hosts  (In this case to print the contents of the /etc/hosts file.)
+
+When we create a simple web application and runs a simple web server that listens on port 8080. When we use the docker run cmd it runs in the foreground or in an attached mode(means u will be attached to the console or the standard out of the docker container, and u will see the out of the web service.
+
+Run - attach and detach
+$ docker run <image name>  (Docker container in the attached mode)
+
+$ docker run -d <image name>  (Docker container in the detached mode by providing the -d option)
+				(this will run the docker container in the background mode, and u will be back to ur prompt immediately.)
+
+$ docker attach <name/ID(5 character)>    (If u want to attach back to the running container then run the docker attach cmd and specify the name or ID of the Docker container.)
+
+$ docker run -it <image name> bash  (It will run the bash cmd and then it loged me in directly to the container since I specified the -it options.)
+
+$ cat /etc/*release*   (to check the operating system)
+==============================================================================================================================================================================
+docker run jenkins
+
+But as of now, we have to use the following command:-
+
+docker run jenkins/jenkins
+
+Reference:-
+https://www.jenkins.io/blog/2018/12/10/the-official-Docker-image/
+https://hub.docker.com/r/jenkins/jenkins/
+==========================================================================================================================================================================
+Docker Run theory :
+
+$ docker run redis:4.0    (Where 'redis:4.0 is called the tag and docker pull an image of the 4.0 version of redis and runs that.If we don't specify the version/tag docker will take the latest or default version/tag present in the system)
+
+Docker runs in a non-interactive mode.
+If we want to provide the input, must map the standard input in our host to the docker container using the '-i' parameter.
+The '-i' parameter is for interactive mode.when the input is given then it will print the output.
+
+$ docker run -i <conatinername/imagename>
+
+The -t stands for pseudo terminal. With the combination of -i and t we're now attached to the terminal as well as in an interactive mode on the container.
+
+$ docker run -it <conatinername/imagename>
+
+=========================
+Port Mapping/publishing on container
+
+Every docker container gets an IP assigned by default. It is internal IP and is only accessible within the docker host.
+To access the IP we need to map the port inside the docker container to a free port on the docker host.
+
+$ docker run -p 80:5000 <image/container name>    (Users to access my application through port 80(any port number) on my docker host. I could map port 80 of the local host to port 5000(example of the internal port) on the docker container using the -p parameter in run cmd.)
+The user can access my application by going to url: http://192.168.1.5.80  and all traffic on port 80 on my docker host will get routed to port 5000 inside the docker containers.
+This way we can run multiple instances of our application and map them to different ports.
+In port mapping we can run as many application and map them to as many ports and u cannot mapto the same port on the docker host more than once.
+
+=========================================================
+RUN - Volume mapping (Data is persisted in a docker container)
+
+Docker container has its own isolated file system and any changes to any files happen within the container.
+
+If we want to persist data and map a directory outside the container on the docker host to a directory inside the container
+In such case we need to create a directory called(ex) /opt/datadir and map that to(any container location present in the docker host in this mysql taken as the ex) /var/lib/mysql  inside the docker container using the -v option and specifying the directory on the docker host, followed by a colon and the directory inside the docker container.
+$ docker run -v /opt/datadir:/var/lib/mysql mysql       (It will implicitly mount the external directory to a folder inside the docker container)
+
+=======================================================
+Inspect Container
+
+$ docker inspect <container name/id>  (all details of the container and displays in JSON format )
+
+Container Logs
+
+$ docker logs <container name/id>   ( to view the details that was run previous in the detached mode)
+================================================================================================================================================================================================================================================================================================================================================================
+
+Docker Images
+
+Dockerfile is a text file written in a specific format that docker can understand. It's in an instruction and arguments format.Everything on the Left written in caps are instructions.Each of the instructionsin docker to perform a specific action while creating the image and everything on the right side are arguments.
+In the dockerfile it's important to start with a FROM instruction.
+{Dockerfile}
+FROM Ubuntu
+
+RUN apt-get update
+RUN apt-get install python
+
+RUN pip install flask
+RUN pip install flask-mysql
+
+COPY . /opt/source-code
+
+ENTRYPOINT FLASK_APP=/opt/source-code/app.py flask run
+
+
+RUN instructions installs all the required dependencies on the image.
+COPY instruction copies files from the local system onto the docker image.
+ENTRYPOINT instruction specify a cmd that will be run when the image is run as a container.
+
+When Docker build the images, it build these in a layered architecture.
+Each line of instruction creates a new layer in the docker image with just the change from the previous layer.
+
+$ docker build Dockerfile -t sajith/my-custom-app   (All the layer built are cached, so th layared architecture helps u restart docker build from that particular step in case it fails or to add new steps in the build process.
+If any of the layer fails then it will re-run docker build use the previous layers from the cached and continue to build the remaining layers and same process when we add any new additional instruction to it.
+

@@ -1,0 +1,253 @@
+Kubernetes was introduced by Google. Donated to CNCF(Cloud native computing foundation which is part of linux foundation) in 2014 and open-source tool.
+Kubernetes is written in Go/Golang
+Kubernetes is all about orchestrating containerized apps.
+
+Go, also known as Golang, is an open-source programming language created by Google in 2007.
+Go is often used for building large-scale distributed systems and high-performance applications.
+
+--> Kubernetes is also about managing containers at scale.
+
+>>How kubernetes came into picture??
+ Borg >>>>Omega>>>>Kubernetes(open source)
+Kubernetes comes from a Greek word "Helmsman".
+
+K8s>>It means that the 8 character between K and s.
+
+---> Kubernetes package it up as a container, give kubernetes a declarative manifest, and it'll take care of the rest of the complexities of running it and making sure it stays running.
+=====================================================================================================================================================
+
+Kubernetes is an Orchestrator for microservice apps that run on containers.
+-An microservice app is just a name for an application that's made up of lots of small and independent services.
+
+>>Start with our (Apps) Application and package it up and we give it to the cluster,the cluster being kubernetes. Its is amde up of one or more masters and a bunch of nodes.
+Masters(cluster control plane) are in-charge and they make the desicions about which nodes to run work on.
+Nodes run the actual work and also they report back to the masters,a nd they watch for changes.
+The packaged application is now send to the cluster. the best way is k8s deployment(We write the code and then it is containerized, now we define it in an object called deployment and 
+ to do this process we define it in a YAML file.)
+==============================================================================================================================================
+Kubernetes Master
+
+>>Kubernetes cluster is effectively a bunch of masters and nodes.
+>>A master is actually a bunch of moving parts, in simplest and common setup they all run on a single server.
+      --To keep the master free of user workloads. So run apps on the nodes and keep the master free for looking after the cluster. It just keep clean and simple.
+
+Kube-apiserver
+It's a Front-end into master or the control plane. It exposes a RESTful API, and it consumes JSON.
+So basically we send our manifest files, these declare the state of our app like a record of intent. The master validates it, and it attempts to deploy it on the cluster.
+ 
+Cluster Store
+If the API serves as the brains of the cluster, then the store is definitely its memory. so the config and the state of the cluster gets persistently stored in etcd. 
+--So etcd is an open source distributed key value store. It's developed by the guys at CoreOs. but distributed , consistent, watchable..
+Kubernetes uses etcd as the source of the truth for the cluster.
+
+Kube-Controller-Manager
+So this component implements a few features and functions that split into separate and even plugable services.
+Bunch of controller:
+-Node controller.
+-Endpoints controller.
+-Namespace controller.
+These are practically a controller for everything.
+The aim is to make sure that the current state of the cluster matches our desired state , But they are all managed by the controller manager.
+
+Kube-scheduler
+It watches apiserver for new pods, and it assigns them to workers(nodes).
+It has huge things to thing about it some of them are :
+- affinity/ anti-affinity.
+- constraints.
+- resource mangement.
+
+>>Bcz the API server is our front end into the master and it's the only component in the master that we really deal directly with it.
+     Sometimes we fall into just calling the master such as issue cmd to the master or  whatever, actually mean issue cmds to theAPI server.
+>>No other master components expose an endpoint for us.Just the API server, and by default that does it on port 443.
+>>Master is the brain of kubernetes. Commands and queries come into the API server component of the master, we can stick authentication on at this point.
+>>kubectl is the cmd line utility, but they're formatted as Json.
+======================================================================================================================================
+Kubernetes Nodes
+
+Nodes(workers) are nothing but does what some powerful master tells it to. 
+Nodes is unimportant faceless figure that just does what the master says.
+Nodes there are three important thing to take care i.e:-
+- Kubelet.
+- Container runtime.
+- kube-proxy.
+
+Every node or worker out there has its own set of default system pods, stuff like logging and health checking and DNS and all of that.
+
+Kubelet:
+The kubelet is the main kubernetes agent in the node. we can say that the kubelet is the node.
+ So, we install it on a linux host, It registers the host as a node in the kubernetes cluster, and then it watches the API server on the master for work assignments.
+ Anytime it sees one it carries out the task, and then it maintains a reporting channel back to the master.
+ Whatever reason the kubelet can't run the work or maybe something goes wrong, it reports back to the master, and the control plane in the master decides it.
+So if a pod fails on a node, the kubelet is not responsible for restarting it or finding another node for it to run on. It simply reports the state back to the master.
+The Kubelet exposes an endpoint on the local host on port 10255 where u can inspect it.
+  Port 10255 on the nodes inspect the specs of the kubelet
+  Spec : it gives the information about the node it's running on.
+  healthz : To check the health check endpoint.
+   Pods : Shows the running pods.
+Kubelet works with pods.Pod is one or more containers packaged together and deployed as a single unit. But bcz it's containers inside of the pods, the kubelet needs to work with the container runtime to do all the container management stuff.
+
+Container Engine:
+Does Container Management:
+- Pulling images.
+- Starting/stopping containers
+The container runtime is going to be docker, though CoreOs rkt is also on the scene.
+In the case of Docker, it uses the native Docker API.
+
+Kube-Proxy:
+This is the network brains of the node.
+It makes sure that every pod gets its own unique IP(ALL container in a pod share a single IP) that actually one IP per pod.
+  If u want to address individual containers within the pod, we are going to be using ports.
+The proxy also dos lightweight load balancing. (Load balances across all pods in a service)
+A service is hiding mutiple pods behind a single network address. so the service balance all requests across it and that load balancing is the responsibility of the kube-proxy.(Number of Pods in Front-end is connected to the single service IP and the service divides the request to the back-end(responsibility) based on the pods present in the backened).
+
+Kubelet :-It Register the node with the cluster and then it watches the API server on the master for work packages. Those work packages are basically pods, and then reports back to the master on the status of the work that it's running 
+Container Engine: This is usually Docker, but rkt from CoreOS gives us a choice there.
+Kube-proxy: It makes all of the kubernetes networking happen on the node.
+==============================================================================================================================================================================================================================================================
+Desired state and Declarative model:
+
+Kubernetes operates on a declarative model. This means we give the API server manifest files that describe how we want the cluster to look and feel.
+We do't dive it a long list of cmds that it needs to run to that state.
+>>In this case we describe the cluster or the app to look like. Use this image , make sure there's always five copies running, that type of stuff>
+    Kubernetes takes care of all the hard work of pulling images, starting containers, building networks, running reconciliation loops, all of that. To do this we issue kubernetes with manifest files that describe what we wnt the cluster to look like.
+    Then  those manifest files are effectively a record of intent, and they constitue what we call the desired state of the cluster.
+We never interact with kubernetes imperatively, or we shouldn't. We give declarative manifest files that describe how we want the cluster to look. These form the basis of the cluster's desired state.
+===========================================================================================================================================================================================================================
+Pods:
+
+The atomic units of kubernetes is a pod.
+Kubernetes run containers, but always inside of pods. But cannot deploy a container directly on to kubernetes.
+A container without a pod in kubernetes is a naked container, and kubernetes has pretty strict views on nudity.
+Pods can have multiple containers.
+Pod is just a ring -fenced environment to run containers, so the pod itself doesn't actually run anything. It's just a sandbox of sorts to run containers in.
+  So you ring-fenced this area on a node, build a network stack, create a bunch of kernel namespaces, and then u run one or more containers in it.
+To run multiple containers in a pod, they all share a single pod environment.(All containers in pod share the pod environment)
+If u have two containers in a pod, they both share the same IP.
+
+Tight Coupling:
+In a use case where we need tightly coupled maybe a  couple of containers need to share memory or volume the stick them in a single pod.
+
+Loose Coupling
+Stick them in separate pods and couple them over the network.
+
+Pods and Scaling
+The unit of scaling in kubernetes is also the pod.
+To scale a component in a app , we do it by adding and removing pods.
+We cannot scale it by adding more of the same containers to an existing pod.
+If we want to scale an element up or down in our application, add or remove pod replicas.
+
+Multi- container pods
+So if they are not for scaling, then it offer two or more complementary containers or application services, that need to be intimate.
+Ex:- A containerized web server with a log scrape that you want right beside it, tailing the logs to a logging service somewhere. In that situation, We can put these two together in a pod. we call the pod as the main container and the log scraper called sidecar container.
+
+The pod is never declared up and available until the whole lot is up and running.
+We can't have single pod over multiple nodes. So pods exit on a single node.
+
+Pod Lifecycle
+If a pod fails/die the replication controller starts another one in its place.
+
+Deploying Pod
+Deploy pods indirectly as part of something higher like a deployment. But it is possible to deploy them directly by giving the API server a pod manifest file. (Declaration of desired state, and it's YAMLfile.)
+The API server validate it, runs the nodes in the cluster and then deploys it to one of them that satisfies requirements.
+
+Replication Controller
+This is basically a high level construct like deployment that takes the pod and add feature to them. It is all about deplying multiple replicas of a single pod then make sure that the required number of replica is always running.
+===========================================================================================================================================================================================
+Services
+
+The Service came into picture is that we have got pods hosting the web front-end, needing to talk to a couple of pod.
+In such case we slip in a service object between the front and back end.
+{A service object is just a kubernetes object like a pod or a deployment, so we define it with a YAML manifest and then we create it by throwing that manifest at the API server.
+But it effectively sits in front of the back end and provides a stable IP and DNS name for these pods. So that's a single IP and DNS name that loads balances requests coming into back-end pods, then if one of the pods fail and gets replaced by another new pod .
+The service updates itself with the details of the new pod. But it keeps on servicing the same IP and DNS, and it load balances across the two pods again.
+Same goes if we scale the pods up or down. All the new pods with the new IP and they get added to the service we're load balancing across pods in back-end.}
+
+>>Service: The higher-level stable abstraction point for multiple pods, and they provide load balancing. 
+                  -  the way that a pod belongs to a service is via labels.
+	      The labels are the simplest and most powerful thing in kubernetes.
+	       Everything in kubernetes gets labels.
+	       The label will  tie the together (i.e the service and the pods).
+In the case of the load balancing over service(any) it decide based on the label selector.(i.e all pods and objects with these three labels are identified an thats how it decide to load balance over.)
+
+*>>Services only send traffic to healthy pods, so if ur pods are failing health checks, then a service isn't just blindly going to send traffic to them.
+       They can also be configured with session affinity in a YAML file, but at the time of recording this is not on by default. We can also configure a service to point things outside of the cluster.
+Load Balancing is purely by default. DNS round robin is supported and can be turned on and default TCP, but UDP is totally supported as well.
+Services will provide stable IPs and DNS name in the unstable world of pods.
+========================================================================================================================================================================================================================================================
+Deployments
+
+Note: The smallet unit of work we can deploy on them is the pod, and pods have one or more containers. We don't work with the pod directly.
+	And the longest time we've taken this higher abstraction called the replication controller and using those to deploy pods. They added things like scaling and self-healing and even rolling updates.
+         We might deploy a replication controller that says four replicas of X particular pod running. Well, we define it ina YAML file and we throw it at the API server.
+Replication controllers are great. It's just deployments are even greater.
+
+*>>Deployments are all about Declaractives.(It is more helpful in production env)
+YAML : It's listing out a bunch of cmds or steps on what to do. (like the opposite of the declarative model where you specify that particular task need to be done)
+	- Self documenting.
+	- Versioned.
+	- Apec-once deploy-many.
+	- Simple rolling updates and rollbacks.
+
+*>> Deployments are proper first-class REST objects in the kubernetes API. So we define them in a YAML file or JSON, but we define them in the standard kubernetes manifest files, and we deploy them by throwing those manifest at the API server, same as pods and replication controllers.
+       In the same way that replication controllers add features and functionalities around pods, deployments do the same for application controllers.
+	- In the deployments the replicatin controllers have been replaced by replica sets.
+	- We really don't involved with the replica sets and pods.
+       So rolling updates are a core feature of the DNA of deployments, and we can run multiple concurrent versions of a deployment in a true and simple blue-green or even a canary release.
+Kubernetes can detect and stop rollouts if they're not working.
+
+Note: Deployments they build on pods and replica sets, and add a more features like versioning, rolling updates, concurrent releases and simple rollbacks.
+
+
+>>>>Pods, replication controllers, deploymentd and services are all the RESTAPI objects in the k8s API.
+
+============================================================================================================================================================================================================================================================
+            Installation Process:
+=======================================================================================================================================================================================================================================================
+Minikube is all about spinning up local development environment on the laptop,but it spins up a fully working kubernetes cluster on ike mac or windows.
+
+cmd to install in mac: 
+  $ brew/code install kubectl
+  $ kubectl version --client
+  $ brew cask install minikube
+  $ brew install docker-machine-driver-xhyve
+
+  $ minikube start --vm-driver=xhyve (this cmd will tell that kubectl is now configured to use the cluster.
+  $ kubectl config current-context
+>>>  kubectl can be configured to talk to any kubernetes cluster. so i can use this same kubectl here to talk to my production cluster, then switch it over to minikube.
+   $ kubectl get nodes (to list all the nodes)
+   $ minkube stop ( to stop the local kubernetes cluster)
+   $ minikube delete ( to delete local kubernetes cluster)
+
+cmd to install in windows we need to download kubeletand minikube from the official website
+    $ minikube version
+    $ minkube start --vm-driver=hyperv --kubernetes- version="v1.24.2"
+    $ kubectl get nodes
+    $ minikube dashboard
+    
+
+Installating the kubeadm:-
+   Docker is the container runtime.
+   kubeadm is the tool used to build the cluster.
+   kubelet is the kubernetes node agent 
+   kubectl is the kubernetes client
+   kubernetes CNI installs support for CNI networking. CNI being the container network interface or the spec or model for kuberentes networking. then we'll initialize a new cluster. we'll create an overlay network for the pods and we'll add some worker nodes.
+
+   $ apt-get update && apt-get install -y apt-transport-https
+The packages and repos will be different if you're using a different distro.
+   $ curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+   $ cat <<EOF >/etc/apt/sources
+   $ deb http://apt.kubernetes.io/ kuberntes-xenial main
+   $ EOF
+   $ apt-get update
+To install the required package
+  $ apt-get install docker.io kubeadm kubectl kubelet kubernetes-cni
+
+   $ kubeadm init ([kubernetes master has initialized]To start an new cluster and then it will pulled all the required images, created the cluster related system pods and we should have our single node cluster.
+      (after running the above cmd u can see below it shows the cmd to start using ur cluster, you need to run these cmd so copy that cmds and run one by one. 
+          so all they're doing is copying the kubernetes config file from etc/kubernetes, ptting that in my home directory, changing its ownership to me and then exporting an environment variables that tells kubernetes where to find this config).
+        [To add the couple of nodes we need the cluster's join token, this is avaiable when we run the above cmd and scroll down to find the token to join the cmd and run it in the new ubuntu window.
+         [$ kubeadm join --token <token id>] 
+    $ kubectl get nodes
+    $ kubectl get pods --all-namespaces (namespaces just says show me the system pods as well)
+    $ kubectl apply file <filename/url> (to install new plugins or add-ons, tell it to use a file.)
+>>It is just a single master 0HA cluster.

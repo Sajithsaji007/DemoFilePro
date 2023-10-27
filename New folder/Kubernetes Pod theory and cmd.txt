@@ -1,0 +1,128 @@
+In the kubernetes the atomic unit  of scheduling is 'Pod'.
+
+A pod contains one or more containers. Usually one, but multiple containers inside of a podis definitely a thing.In fact it is good to use tightly couple services.
+
+When we deploy a pod to a cluster by defining it in a manifest file. Then, you feed this manifest file to the API server, and then the scheduler deplops it to a node.
+ Depending on what's defined in the manifest file, that pod's going to have one or more containers.
+
+Irrespective of how many containers are inside the pod, the pod just gets a single IP. This is a one-to-one pod relationship.
+So every container inside the pod share a single network namespace. But it's also a single localhost adapter, and also that single set of ports.
+
+All containers in a pod share the same cgroup limit. they've got access to the same volumes, the same network and even the same IPC namespaces.
+It's constantly changing as things like PID and namespaces.
+
+Just think of the pod as holding all the namespaces, and any containers that they run, just joining and sharing those namespaces.
+
+
+>>>Inter-pod communication:-
+	It is simple bcz all pod addresses are fully routable on the pod network.
+	Every pod gets its own IP that's routable on that network. This means every pod can talk directly to every other pod, and there's no need to mess about with nasty port mapping or any thing that is called inter-pod communication.
+
+>>>Intra-pod communication
+	Inside a pod, we have multiple containers in there, well there all talk over the shared localhost interface and you need to make multiple containers avaliable outside of the pod, then you do that by exposing them on ports.
+        	  -The pod gets the IP.
+	  - The pod gets deployed.
+
+There is no half deployed pod .It's either all of the containers in a pod come up and then the pod itself comes up or they don't, and the pod fails. Unless one of the containers in a pod started and the other's in a failed state, but the pods partially up that's not how itworks.
+The pod gets deployed to just a single node, and this is just like VM's or containers. We cannot have half of a pod on one node and half on another node.
+One pod gets scheduled to one node.
+
+>>Pods:  Lifecycle
+You define it in a manifest file, YAML or JSON. Then u throw that manifest at the API server, and gets scheduled to a node.
+  Once it's scheduled to a node, it goes into the pending state while the node downloads images and files up the containers. It stays in this pending state till all containers are up and ready.
+    Onces that's done, it goes into the running state.then once it's done and dusted with everything it was created to do, it gets shutdown and the state changes to succeeded.
+	
+	Lifecycle
+        YAML or JSON file >> API server >> Pending >> Running >> Succeeded
+                                                       \           /
+                                                      Failed state
+
+If it can't start for whatever reason, it can remain in the pending state or maybe eventually go to the failed state.
+
+
+Highlights:
+-Pods are the smallest unit of scheduling in kubernetes.
+-You can have more than one container in a pod.
+-Pods get scheduled on nodes that can never end up with a pod spanning multiple nodes.
+-They are defined declaratively in a manifest file.
+=================================================================================================================================================================
+kubectl is bascially the kubernetes client binary and vital.
+
+YAML file Format :
+apiVersion:  v1    (We're setting the version of the API to use v1.) 
+kind:  Pod           (this tells kubernetes what kind of object to deploy in this case its pod.It depends on the kind we need to populate with different values like replication controllers, services, deployment. kubernetes knows what type of object we want to deploy in the manifest file.)
+metadata:
+     name: hello-pod  (we're just naming this one hello-pod and we can put any name u want here.)
+     labels:                    (We use the label to specify the key-value pair)
+        zone:  prod     {these are key value pairs}
+        version:  v1   
+spec:                          {under the spec where we define what's in the resource. but inside of it, we're saying we'll have a single container, just not the old container, we're going to call in this case is 'hello-ctr' and we're basing it of to image what is specified(ex:nigelpoulton/pluralsight-docker-ci:latest) and we're exposing it on port 8080)
+    containers:
+    -   name:  hello-ctr
+         image:  nigelpoulton/pluralsight-docker-ci:latest 
+         ports:
+         -   containerPort: 8080     {If it was a multi-container pod then, we define more containers below the 'containerPort'.)
+
+$ kubectl create -f pod.yml   (To deploy it, we go kubectl create and tell it to deploy from a file . then the filein this directory called the <filename.yml> {So it will create the pod})
+       [It just the definition on the cluster created and it might not actually be deployed yet.]
+
+$ kubectl get pods  (To check the pod is ready and it's currently in the container creating state.)
+		 (It shows all pods in the default namespace.)              
+
+$ kubectl describe pods  (It will describe the pod which is created and also show the status of the pod [state of the containerCreating is actually is the container state, not the pod state.] and also u can see the image pulling status. After using this cmd then try running the cmd kubectl get pods we're u can see the container running.)
+
+$ kubectl get pod/<name of the pod>   (To see that particular pod status)
+
+$ kubectl get pod --all-namespaces       (To see all pods in all namespaces, like system pod and so on)
+
+>>> The reason we do't work directly on pods is bcz there are higer-level objects that expand on them and make them better. A coomon one is the replication controller object(Implements desired state)
+>>Replication controller understanding:
+For ex: Assume we want five replicas of a pod, and u wanted them to always be running.
+      We deploy a replication controller that specified the pod and defined the desired state of having five replicas of that pod.
+      YAML format:
+	apiVersion:  v1	
+	kind:  ReplicationController
+	metadata:
+	     name:  hello-rc(any name)
+	spec:
+                      replicas:  5
+It actually throw it at the API server and kubernetes would deploy it to the replication controller. bcz we define the pod within the replication controller,part of deploying that replication controller actually deploys the pod, in the above yaml file it is 5 replicas.
+Kubernetes thens runs a continuous background loop that's constantly checking to make sure there's always five replicas of the pod running.
+kubernetes takes the hard work, runs a watch loop in the background and make sure that the actual state of the cluster always matches ur desired state.
+
+$ kubectl delete pods <pod name>  (To delete the pod)
+
+Replication Controller config:
+YAML Format ex:
+apiVersion:  v1
+kind:  ReplicationController
+metadata:
+     name: hello-rc
+spec:
+    replicas:  10
+    selector:
+       app:  hello-world
+    template:
+       metadata:
+            labels:
+               app:  hello-world
+       spec:
+           containers:
+           -  name:  hello-pod
+              image:  nigelpoulton/pluralsight-docker-ci:latest 
+              ports:
+              -   containerPort: 8080  
+
+The first four line int he yaml format is the top-level constructs, versions one of the API and we're defining the kind as 'Replicationcontroller' , we're calling it hello-rc and the spec.
+In the above yaml format we are asking for 10 replicas and we are saying select on pods with this selector label here.
+The first eight line is kind of thr replication controller config. then in the template section we're saying use this pod template. And importantly we're giving it the same app equals Hello-world that we tell the controller to select on up here.  
+We are declaring the desired state of 10 replica that we mean pods and configured in template>spec.
+
+$ kubectl create -f rc.yml 
+$ kubectl get rc
+$ kubectl describe rc
+
+$ kubectl apply -f rc.yml  (To update the changes made in the yaml file)
+
+$ kubectl get rc -o wide (to check the status)
+$ kubectl get pods

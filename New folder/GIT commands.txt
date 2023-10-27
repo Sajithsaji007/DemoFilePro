@@ -1,0 +1,174 @@
+>git init    //Initialiation the repository
+// Working tree
+
+>git add .      //It will add all the untracked files into the staging area and now ready for the commit.
+>git add <filename/directoryname>
+
+>git commit -m "the message of the commit"     //the staged area is now moved to the committed file.(A copy of the file is now stored in the .git file)
+
+>git status //show the status of the file i.e staged or unstaged file (it shold be added or untracked status)
+
+>git log          //shows the commit history(the commit that has be done for the each commit and also using the commit we can go back to the previous change of the commit)
+>git log --oneline        //shows the required commit history in one line.
+
+>git checkout <branch>/<commit id>           //this command will checkout to which has been mentioned
+
+>mv <filename/directory> <need to change filename/directory>          //this cmd will help to to move the file/directory to that particular directory/file and also we can rename the file with the same process
+
+>cp <filename/directory> <need to copy to the location of the filename/directory>                             //this cmd will copy the directory or the file to that particular location.
+
+>git commit --amend -m "the new commit"                         // this command will replace the present commit where the Head is present and also replace it with the new commit
+
+>git merge <branch/commit id> //this will merge the branch and also we can merge master to previous commit which by mistake we are not in the master branch,
+In such case we need to copy the commit Id of the present branch and then checkout to the master branch(using the 'git checkout master') the we can do the merge process
+->Merge cmd recieve the name of the branch that we want to merge to our current branch.
+  We need to checkout in master then we need to use the merge cmd to merge the branches.
+	Fast Forward merge.
+	No-Fast Forward merge.
+>git merge <branch name>   // Fast Forward merge:- when the current branch has no extra commit compare to the branch which we are merging. this type of merge doesn't create new commit, but rather merge the branch all with commit present in that particular branch to master branch.
+>git merge <branch name>  //(Indication(master|MERGING))No-Fast Forward merge: the current branch doesn't have any extra commits compare to the branch that we need to merge. Unfortunately i.e the rare case
+
+>git config --global user.name "name" // to configure the name
+>git config --global user.email "email" //to configure the email address
+
+>git config --global --edit  //Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+After doing this, you may fix the identity used for this commit with:
+> git commit --amend --reset-author
+
+> git checkout -b <new branch name>  //this will create the new branch and switch into the new branch.
+
+>git checkout <branch name>  //this cmd will switch the branch.
+>git branch <branch name>  //To create the new branch.
+
+->Branches are nothing more than pointer that are pointing to the certain commit.
+>git branch // To list the branch present and also it will show our current branch.
+
+>git branch -d <branch name>  //To delete a branch
+
+>git commit -am "commit msg"   //git commit -a automatically stage all tracked, modified files before the commit If you think the git add stage of the workflow is too cumbersome, Git allows you to skip that part with the -a option. 
+This basically tells Git to run git add on any file that is "tracked" - that is, any file that was in your last commit and has been modified. This allows you to do a more Subversion style workflow if you want, simply editing files and then running git commit -a when you want to snapshot everything that has been changed. You still need to run git add to start tracking new files, though, just like Subversion.
+
+================================================================================================
+=>Initializing a remote repository
+
+We can add the remote repo to our local project  with below cmd
+> git remote add origin <connection string>  //origin:- to make sure that always know which repository we are pushing to without having to memorize the entire current string followed by the connection string(url).
+--origin is nothing but the alias we can give any name to it.
+
+>git remote -v // To list all the remote repository
+
+In order to work with this remote repository, we can fetch and push the necessary data from out our local project to the hosted repo. 
+In this case, we're both pushing and fetching data from the same remote repository, which git shows us.
+
+In order to keep our local and remote repository in sync we need to push the data from our local to remote repo we use the below cmd.
+> git push origin master
+the cmd expect two arguments: the alias of the remote repo(origin) and the current branch that we're on.
+
+============================================================================================================
+=>Cloning process
+
+> git clone <url/ssh key>  // url/ssh key of the remote repository.
+
+=> Push process
+> git push origin <branch> // To push the package to remote repo with the branch name
+
+=> Remote pull request Setup
+--->In order to merge the new/existing branch with master in the remote repository we need to use the pull request button in the remote repo where the repository present by clicking the button(pull request icon onth righthand side) 
+
+=> Fetch process
+A local repository isn't automatically aware of these changes. so we need have to get these changes into a local repository. we cn do using the git fetch cmd
+> git fetch origin master  //In order to update the origin master branch in our local repo. We can update our local master branch to point to the latest changes made on origin master.
+
+=> Pull process
+>git pull origin master  //Used to pull the origin master branch. Git pull is actually two cmd in one i.e git fetch and merge. We can fetch and merge the remote changes directly into a local master branch.
+
+=> Merge Conflict
+During the conflict git add some extra character to the files that's conflicting. Git shows the currentcontext of the conflicting files, as well as the contents that we're trying to merge
+We can simply remove the lines that we don;t want to keep and leave the line that we do wnt to keep, and the save the file again.
+During the conflict we made some changes to the file which we'll add to git again
+>git add .
+After adding it we can finally merge the branch without any conflicts. Master now contains the combination of the branches.
+==========================================================================================
+=>Forking process
+When we fork the git repository we are actually creating own copy of the original project,free to experiment with it and do whatever you want to do with the repository without impacting the original project. Once we think that we have something to contribute to the original project,we can create a pull request safely.
+The reviewers of the original project now review the changes submitted by me and give feedback.Once PR has been approved by the maintainers, they can merge the change into the original repository.
+
+=>Rebasing process
+> git rebase master  //when we are rebasing branches we're basically putting one branch on top of another branch.
+Although rebasing ia an effective way of getting changes from one branch to another there some more difference compared to merging.
+
+In Git each commit has an unique identifier. The unique identifier is hash that contains information about the commit and makes it possible for us to interact with the specific commits.
+when we merge branches, these unique identifier won't be modified. We are not modifying the history of our git commits when we are merging.
+
+Rebase:- When we rebase branches, we're actually copying the commits from one branch to another. 
+Since se're creating new copied commits the hashes update. we are actually modifying the git history, when we are rebasing the branches.
+
+=>Interactive Rebase
+We can change the history of a git branch with an interactive rebase.We access to this through the '-i' flagin the git rebase cmd
+We have to specify which commits we wan to update.
+> git rebase -i HEAD~4   // In this case we are modify the first four commits by passing the HEAD~4 value, We are telling git taht we are interactively rebase the last four commits.
+{ Rebase f658e19..f679595 onto f658e19 (3 commands)
+#
+# Commands:
+# p, pick <commit> = use commit
+# r, reword <commit> = use commit, but edit the commit message
+# e, edit <commit> = use commit, but stop for amending
+# s, squash <commit> = use commit, but meld into previous commit
+# f, fixup [-C | -c] <commit> = like "squash" but keep only the previous
+#                    commit's log message, unless -C is used, in which case
+#                    keep only this commit's message; -c is same as -C but
+#                    opens the editor
+# x, exec <command> = run command (the rest of the line) using shell
+# b, break = stop here (continue rebase later with 'git rebase --continue')
+# d, drop <commit> = remove commit
+# l, label <label> = label current HEAD with a name
+# t, reset <label> = reset HEAD to a label
+# m, merge [-C <commit> | -c <commit>] <label> [# <oneline>]
+#         create a merge commit using the original merge commit's
+#         message (or the oneline, if no original merge commit was
+#         specified); use -c <commit> to reword the commit message
+# u, update-ref <ref> = track a placeholder for the <ref> to be updated
+#                       to this position in the new commits. The <ref> is
+#                       updated at the end of the rebase}
+
+=================================================
+=>Cherry Pick
+We can have a copy of that commit on the master branch.
+>git cherry-pick <commit id(6digit)> 
+
+======================================================================
+Resetting and Reverting
+Revert cmd is useful if u want to undo changes and keep those changes in our git history.
+
+>  git revert <commit id(4orfull digit)>  //This cmd will revert the commit . 
+This cmd will create a new commit which literaly reverse all the changes that were made on the commit that we specified.
+The reverted commit contains all the opposite changes.It deletes taht files.
+
+Reset cmd:
+there are two ways to reset the commit in order to undo it, either with the --soft flag or with --hard flag
+>git reset --soft HEAD~1  // In this case we still want to keep all the changes that were made.
+The reset cmd also receives the amount of commit that we want to reset, in the above cmd it is one commit.
+
+>git reset --hard HEAD~1  // In order to lose all the changes that were made on that commit.
+In the hard flag the commit will be reset without saving allthose changes.
+=====================================================================
+=>Stashing
+>git stash     // We can stash all changes inthe working area with git stash cmd.
+The modification int working area all will be added to the stash.
+
+>git stash pop  // To get changes back into the working area.
+
+>git stash list   // to see all the stashes that are currently on the stash
+
+>git stash show  <stash id(stash@{id})>    //to show the content of a certain stash
+
+>git stash pop <stash id(stash@{id})>   // to pop specific stash
+===================================================
+Reflog (shows the state of the repository)
+The git reflog cmd shows us all the actions that have been taken on our repo. It includes merges, resets, reverts etc.
+>git reflog   //It will show our previous data history and perform relevent soft or hard flag or so on.

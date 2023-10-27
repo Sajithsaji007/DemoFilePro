@@ -1,0 +1,218 @@
+>mkdir <newdirectoryname> <newdirectoryname> etc
+
+>mkdir <directoryname>/<newdirectoryname>
+
+>mkdir -p <newdirectoryname>/<name>  //to create both the directory
+
+>cd </dir name>  //change directory
+
+Absolute path is the home directory i.e/root
+
+> pwd   // To show the present working directory  (relative path)
+
+>pushd </dir name> //An alternative to 'cd' is the 'pushd' cmd. this cmd remebers the current working directory before changing to the directory specified in the cmd argument.
+
+>popd  // You can push multiple such directories down and then pop back when required.
+
+>mv  <location of the directory/file need to change> <location of the dir/file to locate>  //to move the directory/file requires two arguments.
+
+>cp <location of the directory/file need to change> <location of the dir/file to locate>  //to copy the file
+
+>rm <>     // to remove file or dir
+
+>cp -r <>    to copy and delete where -r is recursive operation.
+
+=>Pagers
+>more <filename>
+>less <filename>
+
+>ls //to list the content of a directory in the linux file system.
+
+>ls -l  //To long list
+
+>ls -a  //shows all the hidded files
+
+>ls -lt  //long list of files in order created
+
+>apropos <keyword>//to know all cmds within the system
+
+=================================================================================================
+Linux Core Concepts:
+
+kernel(Monolithic and modular) has four types:
+-Memory management.
+-Process Management
+-Device Drivers
+-System calls and security
+
+>uname  //to display information about the kernel
+>uname -r  //to print the kernel version.
+>uname -a  //
+
+>>https://kernel.org/  (to check the kernel version)
+
+====================================================================
+Working with Hardware
+
+> dmesg  // Used to diplay msg from an areaa of the kernel called the ring buffer.
+>dmesg | grep -i <Type>  // to display that particular type of msgs
+> udevadm info --query=path --name=/dev/sda5  //the udevadm utility is a mangement tool for udev. info cmd queries the udev database for device information.
+> udevadm monitor  //It print the detaials such as device path and devices name.
+
+> lspci  //To display information about all PCI devices that are configure in the system.
+==PCI -Peripheral component interconnect.
+
+> lsblk //lists information about block devices.
+
+>lscpu  //To display information about the CPU architecture.
+
+>lsmem --summary  // the summary flay to print the summary.
+
+> free -m //shows the total used memory in the system. -m flay display memory in md and -k flag display memory in kb and -g in GB.
+
+>lshw  //to extract detailed information on the entire hardware configuration of the machine.
+
+//The root user privileges to work correctly. some cmds need to be run as the root or thre superuser.
+>sudo lshw // with sudo we can control which user gets to run cmds as the superuser.
+
+==========================================================================================
+Viewing and Changing Systemd Target
+
+>runlevel
+
+> systemctl get-default
+
+> ls -ltr
+
+> systemctl set- default multi-user.target
+
+=> runlevel 0 -> poweroff.target
+=> runlevel 1 -> rescue.target
+=> runlevel 2 -> multi-user.target
+=> runlevel 3 -> multi-user.target
+=> runlevel 4 -> multi-user.target
+=> runlevel 5 -> graphical.target
+=> runlevel 6 -> reboot.target
+==============================================================================================
+Files Types in linux
+
+===============================================================================
+RPM and YUM
+RPM - Package Manager
+>rpm -ivh <package name>.rpm  //Installation
+
+>rpm -e <package name>.rpm   //Uninstallation
+
+>rpm -Uvh <package name>.rpm // upgradation
+
+>rpm -q <package name>.rpm   //Query
+
+>rpm -Vf <path to file>  //Verifying
+
+YUM- Yellowdog Updater Modifier(works on rpm based linux systems)
+> yum install <packagename>  //Installation
+
+>yum repolist  //list of the repository 
+
+>yum provides <packagesname>   //To provide that particular package list
+
+>yum remove <package name>  //to remove the package
+
+>yum update   //To update all the package present in the system
+>yum update <package name>   //to upadte that particular package
+
+===========================================================================
+DPKG and APT
+DPKG - Debian package manager(low level package manager and similar to rpm.
+> dpkg -i <package name>   //Installation and Upgrade
+
+>dpkg -r <package name>  //Uninstallation
+
+>dpkg -l <package name>    //list
+
+>dpkg -s <package name>  //status
+
+>dpkg -p  <path to file>  //Verifying
+
+ APT - Advanced package tool and apt-get(frontened package manager)
+>apt install <package name> //
+
+>apt-get install <package name>
+
+>apt update // to refresh the update
+
+>apt edit-sources //
+
+>apt install <package name>  
+
+>apt remove <package name>
+
+>apt search <package name>
+
+>apt list | grep <package name>
+=============================================================================
+File Compression and Archival
+
+=============================================================================
+Searching for files and Patterns
+
+> locate <file name>  //to find the file name where it is located
+
+>updatedb  //to update the db used in the root user
+
+> find <location of directory> -name <file name>  //to find that file .
+
+Grep (case sensitive) is commonly used to print lines of a file matching a pattern.But it offers a variety of other options as well.
+> grep <followed by word> <filename>  //So this should print out only the line matching the search pattern.
+>  grep -i <followed by word> <filename>   //-i :-Insensitive
+>  grep  -r <followed by word> <filename>  //to research for pattern recurisively within the directory.
+> grep -v  <followed by word> <filename>   // lists all lines that do not contain a particular string.
+>  grep <followed by word>  <filename> //prints both lines of the file i.e followed by the word which will be similsr.
+> grep -w <followed by word>  <filename>// [print that particular word of lines
+>   grep -vw <followed by word>  <filename>//to reverse the search and print all lines of the same file that doen't match the whole word.
+>>Finally the -A and -B cmd flags can be used to print a number of lines after and before matching a pattern.
+> grep -A1  <followed by word>  <filename>  // Print the lines matching the pattern and one line immediately.
+>grep -B1  <followed by word>  <filename>  //-B to print the lines before a matching pattern.
+=========================================================================================================
+IO Redirection:-Standard Input,Output and Error
+Redirect STDOUT
+We can use the forward arrow symbol overwrites the content of the file with the stdout.
+> echo $SHELL > <filename>
+If we want to append stdout to an existing file, use the double forward arrow symbol.
+> echo "msg"  >> <filename>
+
+Redirect STDERR -In order to redirect just the error msgs we need to use number2 followed by a forward arrow symbol.
+>cat <filename> 2> <filename>
+
+If we want to append 
+>cat <filename> 2>> <filename>
+=====================================================================================================
+Command Line PIPES:
+Command line pipes allow the linking of multiple cmds.
+The pipes are defined using the vertical bar symbol.
+This can be used as many times as needed to link together cmds, as long as the cmds themselves are used with the correct syntax.
+================================================================================
+VI Editor has three cmd mode :
+command mode.
+Insert mode.
+Last line mode.
+>vi <filename>  // to create and edit the file.
+>> copy a line >yy
+>>paste >p
+>> delete a letter >x
+>>delete a line > dd
+>>delete 3 lines > d3d
+>> undo >u
+>>Redo> ctrl+r
+>>Find >/'linename'  or ?
+>>Find Previous >N
+>>Find Next > n
+>>Insert mode >i,o,a
+>>cmd mode > esc
+>>save >:w
+>>Quit >:q
+>>Save and quit >:wq
+>>Quit without any change >:q!
+
+VIM (Improved vesion of vi)
+==========================================================================

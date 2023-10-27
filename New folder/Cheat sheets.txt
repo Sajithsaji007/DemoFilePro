@@ -1,0 +1,2 @@
+Window+L   // to lock the screen
+Alt + F4   //shutdown windows

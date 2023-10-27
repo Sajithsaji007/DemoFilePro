@@ -1,0 +1,82 @@
+Kubernetes Service Object:
+
+How do we access our app? (services use the below two options)
+ -From outside the cluster like a web browser on your laptop or something.
+ -Acessing it from the inside the cluster like another set of pods.
+
+Service in kubernetes speak is a REST object, just like pods and replication controllers, but we define them in a YAML file and throw that at the API server.
+Service is an abstraction.
+Service gets a single IP and DNS and por as well. they will never change.
+Request to the service get load balanced across all the pods.
+
+From inside the cluster the other parts of our app can connect to this stable IP or DNS and by default , the DNS name of the service is just the same as the service name.
+From the outside, service sets up a bunch of networking to make the pods her all accessible from outside the cluster.
+
+Note: We have got our pods and we know that they are unreliable, then we layer a service on them ad this is reliable. It gets a virtual IP that stays with it for its entire life, and it getsa DNS name and a port. That port is cluster wide, and it's how we connect in from the outside.
+           Now we've got our nodes in the cluster, and they're running our pods. we create the service objest and that links the pods to a particular port number on every node in that cluster and the port number's the same on every node.(like integrating with your cloud provider's load balancers.)
+
+When you create a service, you're also creating an endpoint object for it. All of the endpoints, so a list of all of the pods in the service. so as pods come and go, the list of them that the endpoint maintains gets updated.
+
+How to tie these pods together with the service?
+  The labels here sticks the service to the pods. we can update service and add or remove labels and that's going to dynamically update which pods the service balances over.
+   The service is the label selector is continuously under watch like 24-hrs survillance, so any changes to the service get immediately reflected to the corresponding endpoint object.
+========================================================================================================================================================================================================================================================
+Service Discovery
+- DNS based (As long as you're running the DNS cluster add-on which, if u followed the install methods. but the DNS cluster add-on implements a DNS service in the cluster.)(It's all pod based)
+    It implements a cluster-based DNS service that configure the kubelet, that's on nodes to go for DNS. Then watches the API server for new services, and it registers them with that DNS. (Services get DNS names that are resolvable inside the cluster.
+- Environment variable (Every pod gets a bunch of environment variables in case you're not using DNS. But this is done when the pod is created.
+        So if u create the pods before u create the service, then it's not going to get the variables.
+
+>>>Services give us a stable networking endpoint for our pods, and they load balance across the pods as well and also lets us to access our pods from outside of the cluster.
+=============================================================================================================================================================================================
+
+$ kubectl expose rc hello-rc --name=hello-svc --target-port=8080 --type=NodePort  (this is the iterative way to create a service object) (In this case we're exposing our replication controller and we'll call hello-svc bcz we're creating a service, the target port's going to be 8080, and we'll expose it via something called NodePort.)                                            					         (rc hello-rc is the previous in the pod theory we took the example)
+
+$ kubectl describe svc hello-svc  (we can describe the service that we have created.)
+
+$ kubectl get svc  (To list all the services)
+
+$ kubectl delete svc <service name> (To delete the service) 
+
+=====================================================================================================================================================================================================
+Sevice manifest file (YAML file)
+
+$ vim svc.yml
+
+YAML format for service:
+apiVersion:  v1
+kind:  Service                
+metadata:
+     name:  hello-svc
+     labels:
+        app:  hello-world
+spec:			(actually we are defining it)
+    type:  NodePort
+    ports:
+    -   port:  8080                            (this is we're the app's exposed on its conainer. So the container that's running inside of all the pods that we're going to have exposes port 8080 and then mapped to the NodePort.
+        nodePort:  30000                   ( we can also specify the nodePort. we're telling the TCP, which actually is the default, so we could've left it out. But u can tell it to the UDP here.)  
+        protocol:  TCP
+    selector:                                         (So this has to match our pods in our application controller.
+        app:  hello-world
+
+In the type: NodePort there's atlest thre major options that could go, we call these service types,and the first one is ClusterIP, and it's the default(this one gives the service a stable IP within th cluster.so it only makes the service available to other nodes in the cluster).
+     Then the second one is the NodePort that we're going with. this one takes that cluster IP, and it adds a cluster-wide TCP or UDP port on top of it. (it is the basic way of exposing the service to the outside. the web browser is totally outside of this cluster.)
+      The third one is the LoadBalancer this one takes the NodePort and the ClusterIP and then it adds another layer on top, this time a cloud-native load balancer.
+    
+At the core of the very center is ClusterIP, that makes the pods available on a stable IP, but only from within the cluster. Then we can add a NodePort and wrap that around the ClusterIP, so that our pods are available from outside the cluster. After that we can add or wrap it another
+      layer to the outside to integrate it with the cloud provider's load balancer, and it may vary depending not on all the cloud load balancers are necessrily created equal.
+
+$ kubectl describe pods | grep app       (To check the selector label is going to match our pods)
+
+$ kubectl create -f svc.yml     (-f is file and the service file in yml)
+
+$ kubectl get svc
+
+$ kubectl describe svc hello-svc
+
+
+>>> When we create a service, that also creates an endpoint object that holds all of the pods that service matches. Then it get updated on the fly whenever pods come and go.
+
+$ kubectl get ep   (to see the endpoints)
+
+$ kubectl describe ep hello-svc    ( to describe the endpoint of the service file)

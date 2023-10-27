@@ -1,0 +1,26 @@
+https://github.com/kodekloudhub/linux-basics-course
+
+
+Change the SHELL for Bob from bash to Bourne Shell
+You may need to use sudo for this question. Run:
+sudo chsh -s /bin/sh bob
+When prompted, enter bob's password.
+
+
+Create a new environment variable called PROJECT=MERCURY and
+ make it persistent by adding the variable to the ~/.profile file.
+Use export PROJECT=MERCURY
+and add the value to the .profile by running echo 'export PROJECT=MERCURY' >> /home/bob/.profile
+
+
+
+Set an alias called up for the command uptime and make it persistent by adding to ~/.profile file.
+Run: alias up=uptime
+echo 'alias up=uptime' >> ~bob/.profile
+
+
+Update Bob's prompt so that it displays the date as per the format below:
+Example: [Wed Apr 22]bob@caleston-lp10:~$
+Make sure the change is made persistent.
+Run:PS1='[\d]\u@\h:\w$' and add this to the ~/.profile file
+$ echo 'PS1="[\d]\u@\h:\w$"' >> ~/.profile

@@ -1,0 +1,48 @@
+$ vim <filename>.yml   //to create  a new yaml file and to add the content inside the file.
+
+$ kubectl create -f pod.yml   (To deploy it, we go kubectl create and tell it to deploy from a file . then the filein this directory called the <filename.yml> {So it will create the pod})
+    [It just the definition on the cluster created and it might not actually be deployed yet.]
+
+$ kubectl get pods  (To check the pod is ready and it's currently in the container creating state.)
+             	              (It shows all pods in the default namespace.)             
+
+$ kubectl describe pods  (It will describe the pod which is created and also show the status of the pod [state of the containerCreating is actually is the container state, not the pod state.] and also u can see the image pulling status. After using this cmd then try running the cmd kubectl get pods we're u can see the container running.)
+
+$ kubectl get pod --all-namespaces       (To see all pods in all namespaces, like system pod and so on)
+
+$ kubectl delete pods <pod name>  (To delete the pod)
+
+$ kubectl apply -f  <filename.yml>  (To update the changes made in the yaml file)
+
+$ kubectl get <filename> -o wide (to check the status)
+
+$ kubectl expose rc <yaml name in metadata>  --name= <servicename>-svc --target-port=8080 --type=NodePort  (this is the iterative way to create a service object) 
+
+$ kubectl describe svc hello-svc  (we can describe the service that we have created.)
+
+$ kubectl get svc  (To list all the services)
+
+$ kubectl delete svc <service name> (To delete the service) 
+
+$ kubectl describe pods | grep app       (To check the selector label is going to match our pods)
+
+$ kubectl get ep   (to see the endpoints)
+
+$ kubectl describe ep <service file name.>    ( to describe the endpoint of the service file)
+
+$ kubectl describe deploy <deployment name under the metadata>      (to describe the deployment of the file)
+
+$ kubectl get rs     ( To show the replica set)
+
+$ kubectl describe rs    ( To desrcibe the replica set)
+
+$ kubectl rollout status deployment  <name of the deployment>         (to check the current and desired state of the deployment)
+
+$ kubectl rollout history deployment  <name of the deployment>    (To see the deployment history)
+
+$ kubectl apply -f <name of the deployment>  --record      (The cmd we runto invoke it ans it;s in there bcz we slap the record flag onto the cmd.(if we don't use the record cmd it will show the precious version)
+				                       (Its great for the ordered history record flag)
+
+$ kubectl rollout undo deployment <name of the deployment> --to-revision=1  (this will take it to the previous version 1)
+
+$ kubectl rollout status deployment <name of the deployment>      (to see the status of the rollback of the deployment)

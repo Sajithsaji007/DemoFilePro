@@ -1,0 +1,100 @@
+Kubernetes Deployments:
+
+kubernetes deployment are all about rolling updates and seamless rollback. they are full-on objects in the kubernetes API. But we create them as a YAML or as aJSON file, and we give them to the API server to deploy.
+Replication controller is kind of wrap around pods. so we've got our pods at the core running our apps inside of containers and replication controller will take them to the next level like scalibility, resiliency and desired state and in the background, it runs all the watch loops and stuff to make sure that the actual state of the cluster meets our desired state(based on the number of the pods).
+
+Deployment things take further and they wrap around replication controllers. In the case of deployment it is actually a 'replica set'.
+Deployments mange replica sets and replica set manage the pods. 
+Deployments are all about update and rollbacks.
+
+How to handle updates before deployments?
+ Before we had deployments, we'd deploy our pods through a replication controller. then to update things, we'd create a new replication controller with a new name and also we were creating the new YAMl file with differnt name then we use the below cmd.
+  $ kubectl rolling-update -f updated-rc.yml
+   And we can set a bunch of parameters to control the update.
+
+In the case of the deployment , we create a YAML file and we throw it at the API server. That gets given to the deployment controller and ur app gets deployed on the cluster. behind the scene , you get a replica set and bunch of pods. the deployment will create all that automatically.
+
+Kuberntes is running its background loops and making sure that whatever is on the cluster matches what we asked.then u want to push an update that is made in the YAML file and just push it to the API server. In the background kubernetes creates another new replica set.
+
+
+
+Creating the kubernetes Deployment examples: -
+
+$ vim deploy.yml
+
+YAML format for deployment(file name is deploy.yml):
+
+apiVersion:  extensions/v1beta1         (In the case of deployment we need to specify the API extension.)
+kind:  Deployment                              (In the kind we have specified as deployment and we're telling to send this to the deployment controller and we are giving it a name.)
+metadata:
+     name:  hello-deploy
+spec:
+    replicas:  10
+    template:
+        metadata;
+             labels:
+                app:  hello-world
+        spec:
+            containers:
+            -   name: hello-pod
+                 image:  nigelpoultan/pluralsight-docker-ci:latest
+                 ports:   
+                 -   containerPort:  8080
+
+$ kubectl create -f deploy.yml 
+
+$ kubectl describe deploy hello-deploy     (to describe the deployment of the file)
+
+$ kubectl get rs     ( To show the replica set)
+
+$ kubectl describe rs    ( To desrcibe the replica set)
+
+*>>>We didn't keep the service object running or maybe'you're doing a clean deployment or something, and u want to access it from outside of ur cluster,
+          you're going to need to deploy a service object in front of it.
+
+Updating the deployment ex;
+
+(YAML updated the previous deployment file)
+apiVersion:  extensions/v1beta1         (In the case of deployment we need to specify the API extension.)
+kind:  Deployment                              (In the kind we have specified as deployment and we're telling to send this to the deployment controller and we are giving it a name.)
+metadata:
+     name:  hello-deploy
+spec:
+    replicas:  10		(We're asking for 10 replica up here that's our desired state and then while we're rolling throug the update , never surge to more than 1  above 10, So never more than 11 while we're doing the update.)
+    minReadySeconds:  10             (It's saying that wait for 10 seconds after each new pod comes up before ur market is ready and move onto the next one.)
+    stratergy:                                   (I'm going to specify about how i want the update to happen. So I'm going to nest this stratery map in here and some of the values sre the default values.)
+       type:  RollingUpdate	(we want to do a RollingUpdate strategy, these do exist and no doubt more will be added as thing mature)
+       rollingUpdate:
+          maxUnavailable:  1	(We're telling to update by taking the one pod down at a time and never having more than one extra pod.)
+          maxSurge:  1                         (We're rolling throug the update , never surge to more than 1  above 10, So never more than 11 while we're doing the update.)                 
+    template:
+        metadata;
+             labels:
+                app:  hello-world
+        spec:
+            containers:
+            -   name: hello-pod
+                 image:  nigelpoultan/pluralsight-docker-ci:edge
+                 ports:   
+                 -   containerPort:  8080
+
+$ kubectl apply -f deploy.yml --record   (Its going to iterate through our pods one at a time, but it's also going to wait 10 seconds after each one(minReadySeconds:  10) and it take time to pull the image for each node.)
+			          (The cmd we runto invoke it ans it;s in there bcz we slap the record flag onto the cmd.(if we don't use the record cmd it will show the precious version)(Its great for the ordered history)
+
+$ kubectl rollout status deployment hello-deploy
+
+$ kubectl get deploy hello-deploy     (to check the current and desired state of the deployment)
+
+$ kubectl rollout history deployment hello-deploy    (To see the deployment history)
+
+$ kubectl get rs      (the one with no pods under management at the top, that's from our initial deploy. And one at the bottom is got with the scaled up as part of the update(rollback).)
+
+$ kubectl describe deploy hello-deploy   (to see the current state of the deployment)
+
+In case to check the two or more rollback or two or more versions and effectively two replica sets, we canuse the below cmd
+$ kubectl rollout undo deployment hello-deploy --to-revision=1    (this will take it to the previous version 1)
+					                 (So it'll go through each pod one at a time and wait 10 seconds after each.)
+$ kubectl get deploy
+
+$ kubectl rollout status deployment hello-deploy (to see the status of the updated and the previous version status in the case of the above cmd deployment)
+
